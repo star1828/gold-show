@@ -34,11 +34,8 @@
         });
 
       function handleData(data) {
-        // 将字符串数组转换为小数数组
-        var dataArray = data.data.map(parseFloat);
-
-        data.min = Math.min(...dataArray) - 1;
-        data.max = Math.max(...dataArray) + 1;
+        data.min = data.min - 1;
+        data.max = data.max + 1;
       }
 
       // 创建折线图
