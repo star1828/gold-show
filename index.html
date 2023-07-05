@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>示例</title>
+    <style>
+      #chart-container {
+        width: 600px;
+        height: 400px;
+        margin: 0 auto; /* 将图表容器居中对齐 */
+      }
+    </style>
+    <script src="echarts.min.js"></script>
+  </head>
+  <body>
+    <div id="chart-container"></div>
+
+    <script>
+      // 使用 fetch 函数从 API 获取折线数据
+      fetch("gold/price")
+        .then((response) => response.json())
+        .then((data) => {
+          handleData(data);
+          // 在数据加载完成后，创建图表
+          createLineChart(data);
+        })
+        .catch((error) => {
+          console.error("请求数据时发生错误:", error);
+        });
+
+      function handleData(data) {
+        // 将字符串数组转换为小数数组
+        var dataArray = data.data.map(parseFloat);
+
+        data.min = Math.min(...dataArray) - 1;
+        data.max = Math.max(...dataArray) + 1;
+      }
+
+      // 创建折线图
+      function createLineChart(data) {
+        var myChart = echarts.init(
+          document.getElementById("chart-container"),
+          "",
+          {
+            renderer: "svg",
+          }
+        );
+        // 指定图表的配置项和数据
+        var option = {
+          xAxis: {
+            data: data.times,
+          },
+          yAxis: {
+            type: "value",
+            min: data.min,
+            max: data.max,
+            interval: 1,
+            // data: [0.9000, 0.9200, 0.9400, 0.9600, 0.9800, 1.0000],// 只有type为category时才有效
+            axisLabel: {
+              formatter: function (value, index) {
+                return value.toFixed(2);
+              },
+            },
+          },
+          series: [
+            {
+              // itemStyle: { normal: { label: { show: true } } },
+              data: data.data,
+              type: "line",
+              smooth: true,
+            },
+          ],
+          dataZoom: [
+            {
+              // 这个dataZoom组件，默认控制x轴。
+              type: "slider", // 这个 dataZoom 组件是 slider 型 dataZoom 组件
+              start: 0, // 左边在 10% 的位置。
+              end: 100, // 右边在 60% 的位置。
+            },
+          ],
+          // 主要用来控制图表四周留白
+          grid: {
+            left: "15%",
+            top: "10%",
+          },
+          tooltip: {
+            trigger: "axis",
+            axisPointer: {
+              type: "cross",
+              label: {
+                backgroundColor: "#6a7985",
+              },
+            },
+          },
+        };
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+      }
+    </script>
+  </body>
+</html>
